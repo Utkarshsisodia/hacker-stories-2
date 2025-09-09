@@ -3,7 +3,7 @@ import "./App.css";
 import List from "./components/List";
 import InputWithLabel from "./components/inputWithLabel";
 import Title from "./components/Title";
-const list = [
+const initialList = [
   {
     title: "React",
     url: "https://react.dev/",
@@ -25,10 +25,15 @@ function App() {
   let [searchTerm, setSearchTerm] = useState(
     localStorage.getItem("search") || "React"
   );
+  let [stories, setStories] = useState(initialList);
+  let handleRemoveStories = (item) => {
+    const newStories = stories.filter((s) => item.objectID !== s.objectID);
+    setStories(newStories);
+  };
   let handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
-  let searchedStories = list.filter((l) =>
+  let searchedStories = stories.filter((l) =>
     l.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
   useEffect(() => {
@@ -46,9 +51,10 @@ function App() {
         handleSearch={handleSearch}
         searchTerm={searchTerm}
       >
-        <strong>Search:</strong> </InputWithLabel>
+        <strong>Search:</strong>{" "}
+      </InputWithLabel>
 
-      <List list={searchedStories} />
+      <List list={searchedStories} onRemoveItem={handleRemoveStories}/>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-function Item({ item }) {
+function Item({ item, onRemoveItem }) {
   return (
     <li>
       <span>
@@ -7,6 +7,7 @@ function Item({ item }) {
       <span>{item.author}</span>
       <span>{item.num_comments}</span>
       <span>{item.points}</span>
+      <button onClick={() => onRemoveItem(item)}>X</button>
     </li>
   );
 }

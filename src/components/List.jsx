@@ -1,10 +1,10 @@
 import Item from "./Item";
 
-function List({ list }) {
+function List({ list, onRemoveItem }) {
   return (
     <ul>
       {list.map((item) => (
-        <Item key={item.objectID} item={item} />
+        <Item key={item.objectID} item={item} onRemoveItem={onRemoveItem}/>
       ))}
     </ul>
   );
