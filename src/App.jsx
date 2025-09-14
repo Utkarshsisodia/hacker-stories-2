@@ -21,11 +21,26 @@ const initialList = [
     objectID: 1,
   },
 ];
+const getAsyncStories = () =>
+  new Promise((resolve) =>
+    setTimeout(
+      () => resolve({ data: { stories: initialList} }),
+      2000
+    )
+  );
+  
 function App() {
   let [searchTerm, setSearchTerm] = useState(
     localStorage.getItem("search") || "React"
   );
-  let [stories, setStories] = useState(initialList);
+  let [stories, setStories] = useState([]);
+  
+  useEffect(() => {
+    getAsyncStories().then(result => {
+      setStories(result.data.stories);
+    })
+  }, [])
+
   let handleRemoveStories = (item) => {
     const newStories = stories.filter((s) => item.objectID !== s.objectID);
     setStories(newStories);
@@ -36,6 +51,7 @@ function App() {
   let searchedStories = stories.filter((l) =>
     l.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  
   useEffect(() => {
     localStorage.setItem("search", searchTerm);
   }, [searchTerm]);
