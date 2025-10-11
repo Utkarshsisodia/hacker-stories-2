@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import List from "./components/List";
-import InputWithLabel from "./components/inputWithLabel";
+import InputWithLabel from "./components/InputWithLabel";
 import Title from "./components/Title";
 const initialList = [
   {
