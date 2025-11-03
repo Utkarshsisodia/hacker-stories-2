@@ -31,34 +31,39 @@ const getAsyncStories = () =>
   
   const storiesReducer = (state, action) => {
     switch (action.type) {
-      case 'SET_STORIES':
-        return action.payload
+      case 'STORIES_FETCH_INIT':
+        return {...state, isLoading : true, isError : false,};
+      case 'STORIES_FETCH_SUCCESS':
+        return {...state, isLoading : false, isError : false, data : action.payload,};
       case 'REMOVE_STORIES':
-        return state.filter((s) => action.payload.objectID !== s.objectID);
+        return {...state, data : state.data.filter((s) => action.payload.objectID !== s.objectID)};
+      case 'STORIES_FETCH_FAILURE':
+        return {...state, isLoading : false, isError : true};
       default:
         throw new Error();
     }
   }
   
 function App() {
-  let [isLoading, setIsLoading] = useState(false);
+  const [stories, dispatchStories] = useReducer(storiesReducer,{data : [], isLoading : false, isError : false});
+  // let [isLoading, setIsLoading] = useState(false);
   let [searchTerm, setSearchTerm] = useState(
     localStorage.getItem("search") || "React"
   );
-  let [isError, setIsError] = useState(false);
-  const [stories, dispatchStories] = useReducer(storiesReducer,[]);
+  // let [isError, setIsError] = useState(false);
   
   useEffect(() => {
-    setIsLoading(true)
+    dispatchStories({type : 'STORIES_FETCH_INIT'});
+    
     getAsyncStories()
     .then(result => {
       dispatchStories({
-        type : 'SET_STORIES',
+        type : 'STORIES_FETCH_SUCCESS',
         payload : result.data.stories,
       })
-      setIsLoading(false);
+      
     })
-    .catch(() => setIsError(true))
+    .catch(() => dispatchStories({type : 'STORIES_FETCH_FAILURE'}))
   }, [])
 
   let handleRemoveStories = (item) => {
@@ -70,7 +75,7 @@ function App() {
   let handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
-  let searchedStories = stories.filter((l) =>
+  let searchedStories = stories.data.filter((l) =>
     l.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
@@ -91,8 +96,8 @@ function App() {
       >
         <strong>Search:</strong>{" "}
       </InputWithLabel>
-      {isError && <p>Something went wrong...</p>}
-      {isLoading ? <p>Loading...</p> : <List list={searchedStories} onRemoveItem={handleRemoveStories}/>}
+      {stories.isError && <p>Something went wrong...</p>}
+      {stories.isLoading ? <p>Loading...</p> : <List list={searchedStories} onRemoveItem={handleRemoveStories}/>}
     </div>
   );
 }
