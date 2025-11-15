@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useState } from "react";
+import { useCallback, useEffect, useReducer, useState } from "react";
 import "./App.css";
 import List from "./components/List";
 import InputWithLabel from "./components/InputWithLabel";
@@ -45,10 +45,12 @@ function App() {
   );
   // let [isError, setIsError] = useState(false);
   
-  useEffect(() => {
+  const handleFetchStories = useCallback(()=> {
+    if(!searchTerm) return;
+
     dispatchStories({type : 'STORIES_FETCH_INIT'});
     
-    fetch(`${API_ENDPOINT}React`).then((response) => response.json())
+    fetch(`${API_ENDPOINT}${searchTerm}`).then((response) => response.json())
     .then(result => {
       dispatchStories({
         type : 'STORIES_FETCH_SUCCESS',
@@ -57,7 +59,9 @@ function App() {
       
     })
     .catch(() => dispatchStories({type : 'STORIES_FETCH_FAILURE'}))
-  }, [])
+  }, [searchTerm])
+
+  useEffect(()=> handleFetchStories(),[handleFetchStories])
 
   let handleRemoveStories = (item) => {
     dispatchStories({
@@ -68,9 +72,9 @@ function App() {
   let handleSearch = (e) => {
     setSearchTerm(e.target.value);
   };
-  let searchedStories = stories.data.filter((l) =>
-    l.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // let searchedStories = stories.data.filter((l) =>
+  //   l.title.toLowerCase().includes(searchTerm.toLowerCase())
+  // );
   
   useEffect(() => {
     localStorage.setItem("search", searchTerm);
@@ -90,7 +94,7 @@ function App() {
         <strong>Search:</strong>{" "}
       </InputWithLabel>
       {stories.isError && <p>Something went wrong...</p>}
-      {stories.isLoading ? <p>Loading...</p> : <List list={searchedStories} onRemoveItem={handleRemoveStories}/>}
+      {stories.isLoading ? <p>Loading...</p> : <List list={stories.data} onRemoveItem={handleRemoveStories}/>}
     </div>
   );
 }
