@@ -5,6 +5,7 @@ function InputWithLabel({
   type = "text",
   handleSearch,
   searchTerm,
+  handleSubmit,
 }) {
   return (
     <>
@@ -17,6 +18,7 @@ function InputWithLabel({
         onChange={handleSearch}
         value={searchTerm}
       />
+      <button type="button" onClick={handleSubmit}>submit</button>
 
       <p>
         Searching for <strong>{searchTerm}</strong>

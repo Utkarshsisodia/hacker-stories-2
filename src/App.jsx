@@ -43,6 +43,7 @@ function App() {
   let [searchTerm, setSearchTerm] = useState(
     localStorage.getItem("search") || "React"
   );
+  let [ finalSearchTerm, setFinalSearchTerm] = useState(`${API_ENDPOINT}${searchTerm}`);
   // let [isError, setIsError] = useState(false);
   
   const handleFetchStories = useCallback(()=> {
@@ -50,7 +51,7 @@ function App() {
 
     dispatchStories({type : 'STORIES_FETCH_INIT'});
     
-    fetch(`${API_ENDPOINT}${searchTerm}`).then((response) => response.json())
+    fetch(`${finalSearchTerm}`).then((response) => response.json())
     .then(result => {
       dispatchStories({
         type : 'STORIES_FETCH_SUCCESS',
@@ -59,7 +60,7 @@ function App() {
       
     })
     .catch(() => dispatchStories({type : 'STORIES_FETCH_FAILURE'}))
-  }, [searchTerm])
+  }, [finalSearchTerm])
 
   useEffect(()=> handleFetchStories(),[handleFetchStories])
 
@@ -75,6 +76,9 @@ function App() {
   // let searchedStories = stories.data.filter((l) =>
   //   l.title.toLowerCase().includes(searchTerm.toLowerCase())
   // );
+  let handleSubmit = () => {
+    setFinalSearchTerm(`${API_ENDPOINT}${searchTerm}`)
+  }
   
   useEffect(() => {
     localStorage.setItem("search", searchTerm);
@@ -90,6 +94,7 @@ function App() {
         // label={"Search"}
         handleSearch={handleSearch}
         searchTerm={searchTerm}
+        handleSubmit={handleSubmit}
       >
         <strong>Search:</strong>{" "}
       </InputWithLabel>
