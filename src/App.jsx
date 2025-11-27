@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useCallback, useEffect, useReducer, useState } from "react";
 import "./App.css";
 import List from "./components/List";
@@ -20,55 +21,71 @@ import Title from "./components/Title";
 //     objectID: 1,
 //   },
 // ];
-const API_ENDPOINT = 'https://hn.algolia.com/api/v1/search?query=';
- 
+const API_ENDPOINT = "https://hn.algolia.com/api/v1/search?query=";
+
 const storiesReducer = (state, action) => {
-    switch (action.type) {
-      case 'STORIES_FETCH_INIT':
-        return {...state, isLoading : true, isError : false,};
-      case 'STORIES_FETCH_SUCCESS':
-        return {...state, isLoading : false, isError : false, data : action.payload,};
-      case 'REMOVE_STORIES':
-        return {...state, data : state.data.filter((s) => action.payload.objectID !== s.objectID)};
-      case 'STORIES_FETCH_FAILURE':
-        return {...state, isLoading : false, isError : true};
-      default:
-        throw new Error();
-    }
+  switch (action.type) {
+    case "STORIES_FETCH_INIT":
+      return { ...state, isLoading: true, isError: false };
+    case "STORIES_FETCH_SUCCESS":
+      return {
+        ...state,
+        isLoading: false,
+        isError: false,
+        data: action.payload,
+      };
+    case "REMOVE_STORIES":
+      return {
+        ...state,
+        data: state.data.filter((s) => action.payload.objectID !== s.objectID),
+      };
+    case "STORIES_FETCH_FAILURE":
+      return { ...state, isLoading: false, isError: true };
+    default:
+      throw new Error();
   }
-  
+};
+
 function App() {
-  const [stories, dispatchStories] = useReducer(storiesReducer,{data : [], isLoading : false, isError : false});
+  const [stories, dispatchStories] = useReducer(storiesReducer, {
+    data: [],
+    isLoading: false,
+    isError: false,
+  });
   // let [isLoading, setIsLoading] = useState(false);
   let [searchTerm, setSearchTerm] = useState(
     localStorage.getItem("search") || "React"
   );
-  let [ finalSearchTerm, setFinalSearchTerm] = useState(`${API_ENDPOINT}${searchTerm}`);
+  let [finalSearchTerm, setFinalSearchTerm] = useState(
+    `${API_ENDPOINT}${searchTerm}`
+  );
   // let [isError, setIsError] = useState(false);
-  
-  const handleFetchStories = useCallback(()=> {
-    if(!searchTerm) return;
 
-    dispatchStories({type : 'STORIES_FETCH_INIT'});
+  const handleFetchStories = useCallback(() => {
+    async function runFetch () {
+      dispatchStories({ type: "STORIES_FETCH_INIT" });
     
-    fetch(`${finalSearchTerm}`).then((response) => response.json())
-    .then(result => {
-      dispatchStories({
-        type : 'STORIES_FETCH_SUCCESS',
-        payload : result.hits,
-      })
-      
-    })
-    .catch(() => dispatchStories({type : 'STORIES_FETCH_FAILURE'}))
-  }, [finalSearchTerm])
+    try{
+      const result = await axios.get(finalSearchTerm);
 
-  useEffect(()=> handleFetchStories(),[handleFetchStories])
+      dispatchStories({
+      type: "STORIES_FETCH_SUCCESS",
+      payload: result.data.hits,
+      });
+    }catch{
+      dispatchStories({type : "STORIES_FETCH_FAILURE"})
+    }
+    }
+    runFetch();
+  }, [finalSearchTerm]);
+  
+  useEffect(() => handleFetchStories(), [handleFetchStories]);
 
   let handleRemoveStories = (item) => {
     dispatchStories({
-      type : 'REMOVE_STORIES',
-      payload : item
-    })
+      type: "REMOVE_STORIES",
+      payload: item,
+    });
   };
   let handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -77,9 +94,9 @@ function App() {
   //   l.title.toLowerCase().includes(searchTerm.toLowerCase())
   // );
   let handleSubmit = () => {
-    setFinalSearchTerm(`${API_ENDPOINT}${searchTerm}`)
-  }
-  
+    setFinalSearchTerm(`${API_ENDPOINT}${searchTerm}`);
+  };
+
   useEffect(() => {
     localStorage.setItem("search", searchTerm);
   }, [searchTerm]);
@@ -99,7 +116,11 @@ function App() {
         <strong>Search:</strong>{" "}
       </InputWithLabel>
       {stories.isError && <p>Something went wrong...</p>}
-      {stories.isLoading ? <p>Loading...</p> : <List list={stories.data} onRemoveItem={handleRemoveStories}/>}
+      {stories.isLoading ? (
+        <p>Loading...</p>
+      ) : (
+        <List list={stories.data} onRemoveItem={handleRemoveStories} />
+      )}
     </div>
   );
 }

@@ -18,7 +18,7 @@ function InputWithLabel({
         onChange={handleSearch}
         value={searchTerm}
       />
-      <button type="button" onClick={handleSubmit}>submit</button>
+      <button type="button" disabled={!searchTerm} onClick={handleSubmit}>submit</button>
 
       <p>
         Searching for <strong>{searchTerm}</strong>
