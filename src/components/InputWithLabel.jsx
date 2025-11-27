@@ -1,3 +1,5 @@
+import SearchForm from "./SearchForm";
+
 function InputWithLabel({
   isFocused,
   id,
@@ -8,22 +10,15 @@ function InputWithLabel({
   handleSubmit,
 }) {
   return (
-    <>
-      <label htmlFor={id}>{children}</label>
-      <input
-        autoFocus={isFocused}
-        type={type}
-        name={id}
-        id={id}
-        onChange={handleSearch}
-        value={searchTerm}
-      />
-      <button type="button" disabled={!searchTerm} onClick={handleSubmit}>submit</button>
-
-      <p>
-        Searching for <strong>{searchTerm}</strong>
-      </p>
-    </>
+    <SearchForm
+      isFocused={isFocused}
+      id={id}
+      children={children}
+      type={type}
+      handleSearch={handleSearch}
+      searchTerm={searchTerm}
+      handleSubmit={handleSubmit}
+    />
   );
 }
 
