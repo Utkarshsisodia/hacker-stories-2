@@ -4,6 +4,7 @@ import "./App.css";
 import List from "./components/List";
 import InputWithLabel from "./components/InputWithLabel";
 import Title from "./components/Title";
+import InputForm from "./components/InputForm";
 //   {
 //     title: "React",
 //     url: "https://react.dev/",
@@ -105,7 +106,7 @@ function App() {
     <div>
       <Title>My Hacker Stories</Title>
 
-      <InputWithLabel
+      <InputForm
         isFocused
         id={"search"}
         // label={"Search"}
@@ -114,7 +115,7 @@ function App() {
         handleSubmit={handleSubmit}
       >
         <strong>Search:</strong>{" "}
-      </InputWithLabel>
+      </InputForm>
       {stories.isError && <p>Something went wrong...</p>}
       {stories.isLoading ? (
         <p>Loading...</p>
