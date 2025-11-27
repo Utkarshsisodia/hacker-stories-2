@@ -63,23 +63,23 @@ function App() {
   // let [isError, setIsError] = useState(false);
 
   const handleFetchStories = useCallback(() => {
-    async function runFetch () {
+    async function runFetch() {
       dispatchStories({ type: "STORIES_FETCH_INIT" });
-    
-    try{
-      const result = await axios.get(finalSearchTerm);
 
-      dispatchStories({
-      type: "STORIES_FETCH_SUCCESS",
-      payload: result.data.hits,
-      });
-    }catch{
-      dispatchStories({type : "STORIES_FETCH_FAILURE"})
-    }
+      try {
+        const result = await axios.get(finalSearchTerm);
+
+        dispatchStories({
+          type: "STORIES_FETCH_SUCCESS",
+          payload: result.data.hits,
+        });
+      } catch {
+        dispatchStories({ type: "STORIES_FETCH_FAILURE" });
+      }
     }
     runFetch();
   }, [finalSearchTerm]);
-  
+
   useEffect(() => handleFetchStories(), [handleFetchStories]);
 
   let handleRemoveStories = (item) => {
@@ -94,8 +94,9 @@ function App() {
   // let searchedStories = stories.data.filter((l) =>
   //   l.title.toLowerCase().includes(searchTerm.toLowerCase())
   // );
-  let handleSubmit = () => {
+  let handleSubmit = (e) => {
     setFinalSearchTerm(`${API_ENDPOINT}${searchTerm}`);
+    e.preventDefault();
   };
 
   useEffect(() => {
